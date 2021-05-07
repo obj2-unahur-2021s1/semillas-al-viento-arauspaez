@@ -1,9 +1,10 @@
 package ar.edu.unahur.obj2.semillasAlViento
 
-abstract class Planta(val anioObtencionSemilla: Int, var altura: Float) {
+abstract class Planta(val anioObtencionSemilla: Int, var altura: Float) { //var? = En el enunciado menciona que la altura NUNCA cambiara.
   fun esFuerte() = this.horasDeSolQueTolera() > 10
 
   fun parcelaTieneComplicaciones(parcela: Parcela) =
+  // :warning: Problema de SIMPLICIDAD = Agrega complejidad innecesaria pudiendo realizar el metodo en la clase 'Parcela' directamente.
     parcela.plantas.any { it.horasDeSolQueTolera() < parcela.horasSolPorDia }
 
   abstract fun horasDeSolQueTolera(): Int
@@ -29,10 +30,15 @@ class Soja(anioObtencionSemilla: Int, altura: Float, val esTransgenica: Boolean)
   }
 
 
+  // :warning: Problema de SIMPLICIDAD
+  // * La aclaracion de la rama 'False' es redundante.
+  // * anioObtencionSemilla > 2007 && altura > 1 => Podria estar resuelto en un metodo a parte.
   override fun daSemillas(): Boolean  {
     if (this.esTransgenica) {
       return false
     }
+
+
 
     return this.esFuerte() || (this.anioObtencionSemilla > 2007 && this.altura > 1)
   }
