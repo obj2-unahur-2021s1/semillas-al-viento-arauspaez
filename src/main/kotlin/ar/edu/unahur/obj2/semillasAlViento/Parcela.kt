@@ -3,10 +3,15 @@ package ar.edu.unahur.obj2.semillasAlViento
 class Parcela(val ancho: Int, val largo: Int, val horasSolPorDia: Int) {
   val plantas = mutableListOf<Planta>()
   var cantidadPlantas = 0
+  // :warning: Problema de REDUNDANCIA en 'cantidadPlantas'
+  // * Se asocia al principio DRY.
+  // * Podria resolverse con un 'plantas.size'.
 
   fun superficie() = ancho * largo
   fun cantidadMaximaPlantas() =
     if (ancho > largo) ancho * largo / 5 else ancho * largo / 3 + largo
+  // :warning: Problema de SIMPLICIDAD en 'cantidadMaximaPLantas()'
+  // * Debe retornar directamente el valor que determina la funcion.
 
   fun plantar(planta: Planta) {
     if (cantidadPlantas == this.cantidadMaximaPlantas()) {
@@ -15,12 +20,14 @@ class Parcela(val ancho: Int, val largo: Int, val horasSolPorDia: Int) {
       println("No se puede plantar esto acá, se va a quemar")
     } else {
       plantas.add(planta)
-      cantidadPlantas += 1
+      cantidadPlantas += 1 // :warning: Problema de REDUNDANCIA en 'cantidadPlantas' (ver linea 6)
     }
   }
 }
 
 class Agricultora(val parcelas: MutableList<Parcela>) {
+  // :warning: Problema de COHESION en 'clase Agricultora'
+  // * Podria estar creada en un archivo aparte para mayor claridad en el codigo.
   var ahorrosEnPesos = 20000
 
   // Suponemos que una parcela vale 5000 pesos
@@ -32,6 +39,9 @@ class Agricultora(val parcelas: MutableList<Parcela>) {
   }
 
   fun parcelasSemilleras() =
+    // :warning: Problema de SIMPLICIDAD en 'parcelasSemilleras()'
+    // * Hay 2 acciones diferentes sobre listas en una misma funcion.
+    // * Apunta al principio KISS.
     parcelas.filter {
       parcela -> parcela.plantas.all {
         planta -> planta.daSemillas()
