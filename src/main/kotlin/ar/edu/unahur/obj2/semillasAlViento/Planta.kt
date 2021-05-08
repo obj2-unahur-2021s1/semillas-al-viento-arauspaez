@@ -1,15 +1,16 @@
 package ar.edu.unahur.obj2.semillasAlViento
 
-abstract class Planta(val anioObtencionSemilla: Int, var altura: Float) { //var? = En el enunciado menciona que la altura NUNCA cambiara.
+abstract class Planta(val anioObtencionSemilla: Int, var altura: Float) { //SIMPLICIDAD val altura- La altura NUNCA cambiara.
   fun esFuerte() = this.horasDeSolQueTolera() > 10
 
   fun parcelaTieneComplicaciones(parcela: Parcela) =
-  // :warning: Problema de SIMPLICIDAD en 'parcelaTieneComplicaciones()'
+  // :warning: Problema de DES(ACOPLAMIENTO) en 'parcelaTieneComplicaciones()'
   // * Agrega complejidad innecesaria pudiendo realizar el metodo en la clase 'Parcela' directamente.
     parcela.plantas.any { it.horasDeSolQueTolera() < parcela.horasSolPorDia }
 
   abstract fun horasDeSolQueTolera(): Int
-  abstract fun daSemillas(): Boolean
+  abstract fun daSemillas(): Boolean //COHESIÓN- quedaría más claro crear una función condicionAlternativa() y delegar responsabilidades a esta función
+                                    // para evaluar por un lado si esFuerte() y por otro la condicionAlternativa()
 }
 
 class Menta(anioObtencionSemilla: Int, altura: Float) : Planta(anioObtencionSemilla, altura) {
@@ -17,6 +18,8 @@ class Menta(anioObtencionSemilla: Int, altura: Float) : Planta(anioObtencionSemi
   override fun daSemillas() = this.esFuerte() || altura > 0.4
 }
 
+//SojaTransgenica sería mejor colocarla como una subclase de Soja para arrastrar los métodos (daSemillas() = False y horasDeSolQueTolera() = el doble que la Soja)y no meter toda la lógica en la misma Soja
+//REDUNDANCIA MÍNIMA/COHESION
 class Soja(anioObtencionSemilla: Int, altura: Float, val esTransgenica: Boolean) : Planta(anioObtencionSemilla, altura) {
   override fun horasDeSolQueTolera(): Int  {
     // ¡Magia de Kotlin! El `when` es como un `if` pero más poderoso:

@@ -3,17 +3,19 @@ package ar.edu.unahur.obj2.semillasAlViento
 class Parcela(val ancho: Int, val largo: Int, val horasSolPorDia: Int) {
   val plantas = mutableListOf<Planta>()
   var cantidadPlantas = 0
-  // :warning: Problema de REDUNDANCIA en 'cantidadPlantas'
+  // :warning: Problema de REDUNDANCIA MINIMA en 'cantidadPlantas'
   // * Se asocia al principio DRY.
   // * Podria resolverse con un 'plantas.size'.
 
   fun superficie() = ancho * largo
   fun cantidadMaximaPlantas() =
-    if (ancho > largo) ancho * largo / 5 else ancho * largo / 3 + largo
+    if (ancho > largo) ancho * largo / 5 else ancho * largo / 3 + largo //REDUNDANCIA MINIMA ancho * largo ya está definido en superficie()
   // :warning: Problema de SIMPLICIDAD en 'cantidadMaximaPLantas()'
   // * Debe retornar directamente el valor que determina la funcion.
 
-  fun plantar(planta: Planta) {
+  //ROBUSTEZ - Falta el método tieneComplicaciones()
+
+  fun plantar(planta: Planta) { //COHESION - El condicional del if y else if se puede unir con un && y delegar esa evaluacion en ótro método puedePlantar()
     if (cantidadPlantas == this.cantidadMaximaPlantas()) {
       println("Ya no hay lugar en esta parcela")
     } else if (horasSolPorDia > planta.horasDeSolQueTolera() + 2) {
@@ -26,7 +28,7 @@ class Parcela(val ancho: Int, val largo: Int, val horasSolPorDia: Int) {
 }
 
 class Agricultora(val parcelas: MutableList<Parcela>) {
-  // :warning: Problema de COHESION en 'clase Agricultora'
+  // :warning: Problema de MUTACIONES CONTROLADAS en 'clase Agricultora'
   // * Podria estar creada en un archivo aparte para mayor claridad en el codigo.
   var ahorrosEnPesos = 20000
 
@@ -50,6 +52,6 @@ class Agricultora(val parcelas: MutableList<Parcela>) {
 
   fun plantarEstrategicamente(planta: Planta) {
     val laElegida = parcelas.maxBy { it.cantidadMaximaPlantas() - it.cantidadPlantas }!!
-    laElegida.plantas.add(planta)
+    laElegida.plantas.add(planta) //ROBUSTEZ - Existe un método en la Parcela para plantar() por lo que esta implementacion no es correcta
   }
 }
