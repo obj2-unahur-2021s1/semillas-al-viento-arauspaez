@@ -1,4 +1,5 @@
 package ar.edu.unahur.obj2.semillasAlViento
+import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -7,18 +8,26 @@ import io.kotest.matchers.shouldBe
 
 
 class SemillasTest : DescribeSpec({
+
     //Plantas
     val menta = Menta(1900,0.3F)
-    val soja = Soja(2010,0.4F,false)
-    val sojaTrans = Soja(2020,0.4F,true)
+    val mentaGrande = Menta(1900,0.5F)
+    val soja = Soja(2010,0.4F)
+    val sojaMediana = Soja(2000,0.7F)
+    val sojaGrande = Soja(2010,1.1F)
+    val sojaMasGrande = Soja(2010,1.3F)
+    val sojaTrans = SojaTransgenica(2020,0.4F)
+    val sojaTransMediana = SojaTransgenica(2020,0.7F)
+    val sojaTransGrande = SojaTransgenica(2020,1.1F)
 
-    //Parcela
-    val parcela = Parcela(100,100,7)
-    val parcelaPequenia = Parcela(10,2,11)
-    val parcelaChica = Parcela(5,1,9)
+    //Parcelas
+    val parcela = Parcela(100F,100F,7)
+    val parcelaPequenia = Parcela(10F,2F,11)
+    val parcelaChica = Parcela(5F,1F,9)
 
     //Agricultora
     val agricultora = Agricultora(mutableListOf(parcela,parcelaPequenia,parcelaChica))
+
 
     //TestPlanta
     describe("horas de sol"){
@@ -29,26 +38,22 @@ class SemillasTest : DescribeSpec({
             soja.horasDeSolQueTolera() shouldBe 6
         }
         it("soja entre 0.5 y 1 metro"){
-            soja.altura = 0.7F
-            soja.horasDeSolQueTolera() shouldBe 7
+            sojaMediana.horasDeSolQueTolera() shouldBe 7
         }
         it("soja mayor a 1 metro"){
-            soja.altura = 1.2F
-            soja.horasDeSolQueTolera() shouldBe 9
+            sojaGrande.horasDeSolQueTolera() shouldBe 9
         }
         it("sojaTransgenica menor a 0.5 metros"){
             sojaTrans.horasDeSolQueTolera() shouldBe 12
         }
         it("sojaTransgenica entre 0.5 y 1 metro"){
-            sojaTrans.altura = 0.7F
-            sojaTrans.horasDeSolQueTolera() shouldBe 14
+            sojaTransMediana.horasDeSolQueTolera() shouldBe 14
         }
         it("sojaTransgenica mayor a 1 metro"){
-            sojaTrans.altura = 1.2F
-            sojaTrans.horasDeSolQueTolera() shouldBe 18
+            sojaTransGrande.horasDeSolQueTolera() shouldBe 18
         }
     }
-    describe("esFuerte"){ // si tolera más de 10 horas de sol al día
+    describe("esFuerte"){
         it("menta no esFuerte"){
             menta.esFuerte() shouldBe false
         }
@@ -56,52 +61,45 @@ class SemillasTest : DescribeSpec({
             soja.esFuerte() shouldBe false
         }
         it("soja entre 0.5 y 1 metro no esFuerte"){
-            soja.altura = 0.7F
-            soja.esFuerte() shouldBe false
+            sojaMediana.esFuerte() shouldBe false
         }
         it("soja mayor a 1 metro no esFuerte"){
-            soja.altura = 1.2F
-            soja.esFuerte() shouldBe false
+            sojaGrande.esFuerte() shouldBe false
         }
         it("sojaTransgenica menor a 0.5 metros"){
             sojaTrans.esFuerte() shouldBe true
         }
         it("sojaTransgenica entre 0.5 y 1 metro"){
-            sojaTrans.altura = 0.7F
-            sojaTrans.esFuerte() shouldBe true
+            sojaTransMediana.esFuerte() shouldBe true
         }
         it("sojaTransgenica mayor a 1 metro"){
-            sojaTrans.altura = 1.2F
-            sojaTrans.esFuerte() shouldBe true
+            sojaTransGrande.esFuerte() shouldBe true
         }
     }
-    describe("daNuevasSemillas"){
-        it("menta"){
+    describe("daSemillas"){
+        it("mentaGrande da semillas por altura superior a 0.4"){
+            mentaGrande.daSemillas() shouldBe true
+        }
+        it("menta No da semillas por altura menor a 0.4"){
             menta.daSemillas() shouldBe false
         }
-        it("menta No da semillas"){
-            menta.altura = 0.5F
-            menta.daSemillas() shouldBe true
-        }
-        it("soja No da nuevas semillas por altura menor a 1 metro"){
+        it("soja No da semillas por altura menor a 1 metro"){
             soja.daSemillas() shouldBe false
         }
-        it("soja1 No da nuevas semillas por anio"){
-            val soja1 = Soja(1900,1.5F,false)
-            soja1.daSemillas() shouldBe false
+        it("sojaMediana No da semillas por anio"){
+            sojaMediana.daSemillas() shouldBe false
         }
-        it("soja"){
-            soja.altura = 1.1F
-            soja.daSemillas() shouldBe true
+        it("sojaGrande da semillas por altura superior a 1.0"){
+            sojaGrande.daSemillas() shouldBe true
         }
-        it("sojaTransgenica No da nuevas semillas"){
+        it("sojaTransgenica No da semillas"){
             sojaTrans.daSemillas() shouldBe false
         }
     }
 
     //ParcelaTest
-    describe("La Superficie de la parcela es"){
-        it("superficie es 10000 para ancho 100 y largo 100"){
+    describe("La Superficie de una parcela"){
+        it("de 100 de largo y 100 de ancho"){
             parcela.superficie() shouldBe 10000
         }
     }
@@ -115,36 +113,43 @@ class SemillasTest : DescribeSpec({
     }
     describe("tieneComplicaciones"){
         it("parcela tiene complicaciones para menta"){
-            parcela.plantas.add(menta)
-            menta.parcelaTieneComplicaciones(parcela) shouldBe true
+            parcela.plantar(menta)
+            parcela.tieneComplicaciones() shouldBe true
         }
         it("parcela No tiene complicaciones para sojaTrans"){
-            parcela.plantas.add(sojaTrans)
-            sojaTrans.parcelaTieneComplicaciones(parcela) shouldBe false
+            parcela.plantar(sojaTrans)
+            parcela.tieneComplicaciones() shouldBe false
         }
     }
-    describe("plantarUnaPlanta"){
-        it("parcela puede plantar una planta"){
-            parcela.cantidadPlantas shouldBe 0
+    describe("plantarUnaPlanta") {
+        it("parcela puede plantar una planta") {
+            parcela.plantas.size shouldBe 0
             parcela.plantar(soja)
             parcela.plantas shouldContain soja
-            //parcela.cantidadPlantas shouldBe 1 -
+            parcela.plantas.size shouldBe 1
         }
-        //"Ya no hay lugar en esta parcela" - En este caso no se puede validar esta excepcion ya que al no poder plantar devuelve un string y no hay ningun metodo en kotest para poder validarlo.
-        //"No se puede plantar esto acá, se va a quemar" - En este caso no se puede validar esta excepcion ya que al no poder plantar devuelve un string y no hay ningun metodo en kotest para poder validarlo
+        it("parcela No puede plantar una planta porque alcanzo el limite"){
+            parcelaChica.plantas.size shouldBe 0
+            parcelaChica.plantar(sojaTransGrande)
+            shouldThrowAny { parcelaChica.plantar(sojaTransMediana) }
+        }
+        it("parcela No puede plantar una planta porque se va a quemar"){
+            parcelaChica.plantas.size shouldBe 0
+            parcelaChica.plantar(sojaTrans)
+            shouldThrowAny { parcelaChica.plantar(sojaTransMediana) }
+        }
     }
 
     //Agricultora
     describe("Una Agricultora"){
-        menta.altura = 0.5F
-        it("parcelaSemillera y parcela son semilleras, parcela chica no"){
-            parcelaPequenia.plantas.add(menta)
-            parcela.plantas.add(menta)
-            parcelaChica.plantas.add(sojaTrans)
-            agricultora.parcelasSemilleras().shouldContainExactlyInAnyOrder(parcelaPequenia,parcela)
+        it("parcelaChica y parcela son semilleras, parcela pequenia no"){
+            parcelaChica.plantar(sojaGrande)
+            parcela.plantar(sojaMasGrande)
+            parcelaPequenia.plantar(sojaTrans)
+            agricultora.parcelasSemilleras().shouldContainExactlyInAnyOrder(parcelaChica,parcela)
         }
         it("plantarEstrategicamente planta soja en parcela"){
-            parcela.cantidadPlantas shouldBe 0
+            parcela.plantas.size shouldBe 0
             agricultora.plantarEstrategicamente(soja)
             parcela.plantas shouldContain soja
             //parcela.cantidadPlantas shouldBe 1 - Debería dar 1 pero al no tener "cantidadPlantas += 1" en la funcion plantarEstrategicamente la variable no se modifica.
